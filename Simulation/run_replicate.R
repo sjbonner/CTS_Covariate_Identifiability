@@ -1,13 +1,12 @@
 ## Load packages
 library(tidyverse)
-library(parallel)
 library(MASS)
 
 ## Load package containing common files
-## library(CCI2020)
+library(CCI2020)
 
-library(devtools)
-devtools::load_all("../CCI2020")
+##library(devtools)
+##devtools::load_all("../CCI2020")
 
 ## Source simulation specific code
 source("R/survival.R")
