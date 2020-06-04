@@ -1,5 +1,8 @@
 run_replicate <- function(pars, verbose = TRUE) {
 
+  ## Setup exit condition
+  on.exit(gc())
+
   ## Extract Parameters ##
   attach(pars)
 
@@ -34,22 +37,25 @@ run_replicate <- function(pars, verbose = TRUE) {
 
   sim_data <- generate_data(nind, ncap, d_params, s_params, c_params)
   saveRDS(sim_data, file.path("Data", paste0(model, "_data_", sim, "_", rep, ".rds")))
-
+  on.exit(rm("sim_data"), add = TRUE, after = FALSE)
+  
   ## Fit trinomial model ##
   if (verbose) {
     cat(date(), ": Running trinomial model...\n")
   }
 
-  ## trinomial_out <- run_trinomial(indata = sim_data,
-  ##                                model = model,
-  ##                                coda_dir = "Trinomial",
-  ##                                chains = chains,
-  ##                                burnin = burnin,
-  ##                                sampling = samples)
-  ## saveRDS(
-  ##   trinomial_out,
-  ##   file.path("Output", paste0("trinomial_", model, "_out_", sim, "_", rep, ".rds"))
-  ## )
+  trinomial_out <- run_trinomial(indata = sim_data,
+                                 model = model,
+                                 coda_dir = "Trinomial",
+                                 chains = chains,
+                                 burnin = burnin,
+                                 sampling = samples)
+  saveRDS(
+    trinomial_out,
+    file.path("Output", paste0("trinomial_", model, "_out_", sim, "_", rep, ".rds"))
+  )
+  on.exit(rm("trinomial_out"), add = TRUE, after = FALSE)
+  
 
   ## Fit binomial model ##
   if (verbose) {
@@ -66,7 +72,8 @@ run_replicate <- function(pars, verbose = TRUE) {
     binomial_out,
     file.path("Output", paste0("binomial_", model, "_out_", sim, "_", rep, ".rds"))
   )
-
+  on.exit(rm("binomial_out"), add = TRUE, after = FALSE)
+  
   ## Fit alternative trinomial model ##
   if (verbose) {
     cat(date(), ": Running alternative trinomial model...\n")
@@ -100,7 +107,7 @@ run_replicate <- function(pars, verbose = TRUE) {
     complete_out,
     file.path("Output", paste0("complete_", model, "_out_", sim, "_", rep, ".rds"))
   )
-
+  on.exit(rm("complete_out"), add = TRUE, after = FALSE)
   ## Extract summary ##
   if (verbose) {
     cat(date(), ": Computing summary...\n")
@@ -111,7 +118,7 @@ run_replicate <- function(pars, verbose = TRUE) {
       as_tibble(rownames = "Parameter") %>%
       add_column(Model = model, y = y, .before = 1)
   }
-
+  
   summary_all <- bind_rows(
     as_tibble(trinomial_out$summary, "Trinomial", 3),
     as_tibble(binomial_out$summary, "Binomial", 4),
@@ -123,21 +130,12 @@ run_replicate <- function(pars, verbose = TRUE) {
     summary_all,
     file.path("Output", paste0("summary_", sim, "_", rep, ".rds"))
   )
-
+  on.exit(rm("summary_all"), add = TRUE, after = FALSE)
+  
   ## Clean-up
   if (verbose) {
     cat(date(), ": Cleaning up...\n")
   }
 
-  rm(list = c(
-    "sim_data",
-    "trinomial_out",
-    "binomial_out",
-    "complete_out",
-    "summary_all"
-  ))
-
-  gc()
-
-  return(summary_all)
+  return(1)
 }
