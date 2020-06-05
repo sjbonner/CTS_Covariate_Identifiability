@@ -2,6 +2,9 @@
 #SBATCH --array=1-5
 #SBATCH --time=7:00:00
 #SBATCH --mem=5G
+#SBATCH --error=Logs/rep_${SLURM_ARRAY_TASK_ID}.Rout
+#SBATCH --output=Logs/rep_${SLURM_ARRAY_TASK_ID}.Rout
+
 
 module load gcc/7.3.0
 module load r
