@@ -26,6 +26,7 @@ pars_mat <- crossing(nind = c(500,1000,5000,10000),
                      samples = samples) %>%
   arrange(nind,ncap,model) %>%
   rowid_to_column("sim") %>%
-  crossing(rep = 1:nrep)
+  crossing(rep = 1:nrep) %>%
+  rowid_to_column("task")
   
 write_csv(pars_mat,"parameter_matrix.csv")
