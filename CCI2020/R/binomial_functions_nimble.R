@@ -1,7 +1,7 @@
 ##' Run model with binomial likelihood
 ##'
 ##' Run model with binomial likelihood
-##' @title 
+##' @title Run model with binomial likelihood
 ##' @param indata Input data
 ##' @param model Model ("logit","scaled_logit", or "generalized_logit")
 ##' @param inits Initial values
@@ -11,6 +11,8 @@
 ##' @param burnin Length of burnin period
 ##' @param sampling Length of sampling period
 ##' @export
+##' @import nimble
+##' @import coda
 ##' @return 
 ##' @author Simon Bonner
 run_binomial <- function(indata,
@@ -69,7 +71,8 @@ run_binomial <- function(indata,
   }
 
   ## Run model
-  model_file <- file.path("JAGS",paste0("binomial_",model,".R"))
+  model_file <- system.file("JAGS",paste0("binomial_",model,".R"),
+                            package="CCI2020")
   coda_file <- file.path(coda_dir, paste0("binomial_",model,".rds"))
 
   ## Run model
@@ -91,9 +94,14 @@ run_binomial <- function(indata,
   saveRDS(binomial_mcmc, file = coda_file)
 
   ## Return summaries
-  list(summary = summary(binomial_mcmc),
-       ess = effectiveSize(binomial_mcmc),
-       diag = gelman.diag(binomial_mcmc),
+  output <- list(summary = summary(window(binomial_mcmc, start = burnin + 1)),
        mcmc = binomial_mcmc,
        time = time)
+
+  if (chains > 1) {
+    output$ess <- effectiveSize(window(binomial_mcmc, start = burnin + 1))
+    output$diag <- gelman.diag(window(binomial_mcmc, start = burnin + 1))
+  }
+
+  return(output)
 }

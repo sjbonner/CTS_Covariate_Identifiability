@@ -1,3 +1,6 @@
+## Options
+options(echo = TRUE)
+
 ## Load packages
 library(tidyverse)
 library(MASS)
@@ -5,8 +8,8 @@ library(MASS)
 ## Load package containing common files
 library(CCI2020)
 
-##library(devtools)
-##devtools::load_all("../CCI2020")
+## library(devtools)
+## devtools::load_all("../CCI2020")
 
 ## Source simulation specific code
 source("R/survival.R")

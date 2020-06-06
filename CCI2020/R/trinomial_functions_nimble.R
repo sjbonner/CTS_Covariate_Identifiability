@@ -1,7 +1,7 @@
 ##' Run model with trinomial likelihood
 ##'
 ##' Run model with trinomial likelihood
-##' @title 
+##' @title Run model with trinomial likelihood
 ##' @param indata Input data
 ##' @param model Model ("logit","scaled_logit", or "generalized_logit")
 ##' @param inits Initial values
@@ -11,6 +11,8 @@
 ##' @param burnin Length of burnin period
 ##' @param sampling Length of sampling period
 ##' @export
+##' @import nimble
+##' @import coda
 ##' @return 
 ##' @author Simon Bonner
 run_trinomial <- function(indata,
@@ -70,8 +72,10 @@ run_trinomial <- function(indata,
     }
   }
 
+  
   ## Run model
-  model_file <- file.path("JAGS", paste0("trinomial_", model, ".R"))
+  model_file <- system.file("JAGS",paste0("trinomial_",model,".R"),
+                            package="CCI2020")
   coda_file <- file.path(coda_dir, paste0("trinomial_", model, ".rds"))
 
   nimble_model <- readBUGSmodel(model_file,
@@ -94,11 +98,15 @@ run_trinomial <- function(indata,
   saveRDS(trinomial_mcmc, file = coda_file)
 
   ## Return summaries
-  list(
-    summary = summary(trinomial_mcmc),
-    ess = effectiveSize(trinomial_mcmc),
-    diag = gelman.diag(trinomial_mcmc),
-    mcmc = trinomial_mcmc,
-    time = time
-  )
+   output <- list(summary = summary(window(trinomial_mcmc, start = burnin + 1)),
+       mcmc = trinomial_mcmc,
+       time = time)
+
+  if (chains > 1) {
+    output$ess <- effectiveSize(window(trinomial_mcmc, start = burnin + 1))
+    output$diag <- gelman.diag(window(trinomial_mcmc, start = burnin + 1))
+  }
+
+  return(output)
+
 }

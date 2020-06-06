@@ -1,7 +1,7 @@
 ##' Run model with truncated likelihood
 ##'
 ##' Run model with truncated likelihood
-##' @title 
+##' @title Run model with truncated likelihood
 ##' @param k Truncation factor
 ##' @param indata Input data
 ##' @param model Model ("logit","scaled_logit", or "generalized_logit")
@@ -12,7 +12,9 @@
 ##' @param burnin Length of burnin period
 ##' @param sampling Length of sampling period
 ##' @export
-##' @import spark 
+##' @import spark
+##' @import nimble
+##' @import coda
 ##' @return 
 ##' @author Simon Bonner
 run_trunc_model <- function(k,
@@ -105,7 +107,8 @@ run_trunc_model <- function(k,
   }
 
   ## Run model
-  model_file <- paste0("JAGS/cts_cov_jags_", model, ".R")
+  model_file <- system.file("JAGS",paste0("cts_cov_jags_", model, ".R"),
+                            package="CCI2020")
 
   coda_file <- file.path(coda_dir, paste0("trunc_coda_", k, "_", model, ".rds"))
 
@@ -137,8 +140,8 @@ run_trunc_model <- function(k,
   )
 
   if (chains > 1) {
-    output$ess <- effectiveSize(binomial_mcmc)
-    output$diag <- gelman.diag(binomial_mcmc)
+    output$ess <- effectiveSize(window(trunc_jags_mcmc, start = burnin + 1))
+    output$diag <- gelman.diag(window(trunc_jags_mcmc, start = burnin + 1))
   }
 
   return(output)

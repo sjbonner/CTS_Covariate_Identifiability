@@ -3,4 +3,6 @@
 export(run_binomial)
 export(run_trinomial)
 export(run_trunc_model)
+import(coda)
+import(nimble)
 import(spark)

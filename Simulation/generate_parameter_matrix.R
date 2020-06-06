@@ -11,7 +11,7 @@ if(debug){
   samples <- 100
 }
 if(!debug){
-  nrep <- 20
+  nrep <- 50
   chains <- 3
   burnin <- 2000
   samples <- 20000
