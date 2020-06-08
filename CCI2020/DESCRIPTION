@@ -7,6 +7,8 @@ Authors@R:
            role = c("aut", "cre"),
            email = "sbonner6@uwo.ca")
 Description: This package contains code for running simulations described in the paper CCI2020.
+Depends:
+    nimble
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
