@@ -17,11 +17,12 @@ source("R/generate_data.R")
 source("R/simulation_functions.R")
 
 ## Read command line arguments
-args = commandArgs(trailingOnly = TRUE)
-k = args[1]
+args <- (trailingOnly = TRUE)
+k <- [1]
+pars_mat_name <- args[2]
 
 ## Load parameter matrix
-pars_mat <- read_csv("parameter_matrix.csv")
+pars_mat <- read_csv(pars_mat_name)
 
 ## Run replicate
 test <- run_replicate(pars_mat[k,])
