@@ -74,7 +74,7 @@ run_binomial <- function(indata,
   model_file <- system.file("JAGS",paste0("binomial_",model,".R"),
                             package="CCI2020")
   coda_file <- file.path(coda_dir, paste0("binomial_",model,".rds"))
-
+  
   ## Run model
   nimble_model <- readBUGSmodel(model_file,
                                 data = binomial_data,
