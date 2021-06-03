@@ -6,6 +6,7 @@
 ##' @param indata Input data
 ##' @param model Model ("logit","scaled_logit", or "generalized_logit")
 ##' @param inits Initial values
+##' @param priors Specification of hyperparameters
 ##' @param pars Parameters to monitor 
 ##' @param coda_dir Directory for saving samples
 ##' @param chains Number of chains
@@ -21,6 +22,8 @@ run_trunc_model <- function(k,
                             indata,
                             model = c("logit", "scaled", "generalized"),
                             inits = NULL,
+                            priors = list(phi = NULL,
+                                          p = NULL),
                             pars = NULL,
                             coda_dir,
                             chains = 3,
@@ -93,6 +96,23 @@ run_trunc_model <- function(k,
       inits$upper <- 1
     }
   }
+  
+  ## Set hyperparameters
+  ## Survival
+  if(is.null(priors[["phi"]])){
+    trunc_jags_data$beta.phi.hyper <- rbind(c(0, .01), c(0, .01))
+  }
+  else{
+    trunc_jags_data$beta.phi.hyper <- priors$phi
+  }
+
+  ## Capture
+  if(is.null(priors[["p"]])){
+    trunc_jags_data$p.hyper <- c(0,1)
+  }
+  else{
+    trunc_jags_data$p.hyper <- priors$p
+  }
 
   ## Identify parameters to monitor
   if(is.null(pars)){
@@ -105,7 +125,7 @@ run_trunc_model <- function(k,
       pars <- c(pars, "lower", "upper")
     }
   }
-
+  
   ## Run model
   model_file <- system.file("JAGS",paste0("cts_cov_jags_", model, ".R"),
                             package="CCI2020")

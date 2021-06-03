@@ -5,6 +5,7 @@
 ##' @param indata Input data
 ##' @param model Model ("logit","scaled_logit", or "generalized_logit")
 ##' @param inits Initial values
+##' @param priors Specification of hyperparameters
 ##' @param pars Parameters to monitor 
 ##' @param coda_dir Directory for saving samples
 ##' @param chains Number of chains
@@ -18,13 +19,13 @@
 run_binomial <- function(indata,
                          model=c("logit","scaled","generalized"),
                          inits = NULL,
+                         priors = list(phi = NULL,
+                                       p = NULL),
                          pars = NULL,
                          coda_dir,
                          chains = 3,
                          burnin = 1000,
                          sampling = 1000) {
-
-  ## 1) Format data
 
   ## Extract basic parameters
   Nind <- length(indata)
@@ -57,7 +58,24 @@ run_binomial <- function(indata,
       inits$upper <- 1
     }
   }
-  
+
+  ## Set hyperparameters
+  ## Survival
+  if(is.null(priors[["phi"]])){
+    binomial_data$beta.phi.hyper <- rbind(c(0, .01), c(0, .01))
+  }
+  else{
+    binomial_data$beta.phi.hyper <- priors$phi
+  }
+
+  ## Capture
+  if(is.null(priors[["p"]])){
+    binomial_data$p.hyper <- c(0,1)
+  }
+  else{
+    binomial_data$p.hyper <- priors$p
+  }
+
   ## Identify parameters to monitor
   if(is.null(pars)){
     pars <- c("beta.phi","p")
@@ -69,7 +87,7 @@ run_binomial <- function(indata,
       pars <- c(pars, "lower", "upper")
     }
   }
-
+  
   ## Run model
   model_file <- system.file("JAGS",paste0("binomial_",model,".R"),
                             package="CCI2020")

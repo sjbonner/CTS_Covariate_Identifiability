@@ -53,16 +53,17 @@ model{
     tau.z ~ dgamma(.001,.001)
     sigma.z <- 1/sqrt(tau.z)
 
-    ## Survival probability
-    beta.phi[1] ~ dnorm(0,.01)
-    beta.phi[2] ~ dnorm(0,.01)
+  ## Survival probability
+  for(k in 1:2){
+    beta.phi[k] ~ dnorm(beta.phi.hyper[k,1], beta.phi.hyper[k,2])
+  }
 
   ## Scale parameter
   lower <- 0
   upper <- 1
-
+  
   ## Capture probability
-  p ~ dunif(0,1)
+  p ~ dunif(p.hyper[1],p.hyper[2])
 }
 
     
