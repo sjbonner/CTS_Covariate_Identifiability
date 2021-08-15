@@ -98,6 +98,22 @@ run_trunc_model <- function(k,
   }
   
   ## Set hyperparameters
+
+  ## Covariate model
+  if(is.null(priors[["mu"]]){
+    trunc_jags_data$mu.z.hyper <- c(0,1)
+  }
+  else{
+    trunc_jags_data$mu.z.hyper <- priors$mu
+  }
+
+  if(is.null(priors[["sigma"]]){
+    trunc_jags_data$sigma.z <- c(.74^2, 4)
+  }
+  else{
+    trunc_jags_data$sigma.z <- priors$sigma
+  }
+    
   ## Survival
   if(is.null(priors[["phi"]])){
     trunc_jags_data$beta.phi.hyper <- rbind(c(0, .01), c(0, .01))
