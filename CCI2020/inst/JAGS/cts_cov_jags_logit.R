@@ -48,10 +48,11 @@ model{
 
     ## Covariate model
     for(t in 1:(nocc-1)){
-        mu.z[t] ~ dnorm(0,.0001)
+        mu.z[t] ~ dnorm(mu.z.hyper[1], mu.z.hyper[2])
     }
-    tau.z ~ dgamma(.001,.001)
-    sigma.z <- 1/sqrt(tau.z)
+
+  sigma.z ~ dt(0, sigma.z.hyper[1], sigma.z.hyper[2])
+  tau.z <- 1/(sigma.z * sigma.z)
 
   ## Survival probability
   for(k in 1:2){
