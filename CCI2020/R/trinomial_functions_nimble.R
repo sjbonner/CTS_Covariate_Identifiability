@@ -5,6 +5,7 @@
 ##' @param indata Input data
 ##' @param model Model ("logit","scaled_logit", or "generalized_logit")
 ##' @param inits Initial values
+##' @param priors Specification of hyperparameters
 ##' @param pars Parameters to monitor 
 ##' @param coda_dir Directory for saving samples
 ##' @param chains Number of chains
@@ -18,6 +19,7 @@
 run_trinomial <- function(indata,
                           model = c("logit", "scaled", "generalized"),
                           inits = NULL,
+                          priors = NULL,
                           pars = NULL,
                           coda_dir,
                           chains = 3,
@@ -58,6 +60,32 @@ run_trinomial <- function(indata,
       inits$lower <- 0
       inits$upper <- 1
     }
+  }
+
+  ## Set hyperparameters
+    
+  ## Survival
+  if(is.null(priors[["phi"]])){
+    trunc_jags_data$beta.phi.hyper <- rbind(c(0, .25), c(0, .25))
+  }
+  else{
+    trunc_jags_data$beta.phi.hyper <- priors$phi
+  }
+
+  ## Capture
+  if(is.null(priors[["p"]])){
+    trunc_jags_data$p.hyper <- c(0,1)
+  }
+  else{
+    trunc_jags_data$p.hyper <- priors$p
+  }
+
+  ## Recovery
+  if(is.null(priors[["lambda"]])){
+    trunc_jags_data$lambda.hyper <- c(0,1)
+  }
+  else{
+    trunc_jags_data$lambda.hyper <- priors$lambda
   }
 
   ## Identify parameters to monitor
