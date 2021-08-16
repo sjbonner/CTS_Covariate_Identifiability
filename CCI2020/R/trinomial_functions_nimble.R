@@ -66,26 +66,26 @@ run_trinomial <- function(indata,
     
   ## Survival
   if(is.null(priors[["phi"]])){
-    trunc_jags_data$beta.phi.hyper <- rbind(c(0, .25), c(0, .25))
+    trinomial_data$beta.phi.hyper <- rbind(c(0, .25), c(0, .25))
   }
   else{
-    trunc_jags_data$beta.phi.hyper <- priors$phi
+    trinomial_data$beta.phi.hyper <- priors$phi
   }
 
   ## Capture
   if(is.null(priors[["p"]])){
-    trunc_jags_data$p.hyper <- c(0,1)
+    trinomial_data$p.hyper <- c(0,1)
   }
   else{
-    trunc_jags_data$p.hyper <- priors$p
+    trinomial_data$p.hyper <- priors$p
   }
 
   ## Recovery
   if(is.null(priors[["lambda"]])){
-    trunc_jags_data$lambda.hyper <- c(0,1)
+    trinomial_data$lambda.hyper <- c(0,1)
   }
   else{
-    trunc_jags_data$lambda.hyper <- priors$lambda
+    trinomial_data$lambda.hyper <- priors$lambda
   }
 
   ## Identify parameters to monitor
