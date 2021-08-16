@@ -1,10 +1,16 @@
+##' Run one replicate of the simulation
+##'
+##' Run one replicate of the simulation
+##' @title Run one replicate of the simulation
+##' @param pars Vector of simulation parameters including sim (scenario number), rep (replicate number wihin scenario), nind (number of individuals), ncap (number of individuals), model (either logit, scaled_logit, or generalized_logit), chains (number of chains), burnin (number of burnin samples), samples (number of samples to retain for computing posterior summary statistics)
+##' @param verbose If true then print logging information to console
+##' @export
+##' @return
+##' @author Simon Bonner
 run_replicate <- function(pars, verbose = TRUE) {
   
   ## Setup exit condition
   on.exit(gc())
-
-  ## Extract Parameters ##
-  attach(pars)
 
   if (verbose) {
     cat(date(), ": Setting parameters values...\n")
@@ -13,7 +19,7 @@ run_replicate <- function(pars, verbose = TRUE) {
   ## 1) Covariate model
   d_params <- list(
     mu_init = .5, # Mean initial covariate value
-    drift = rnorm(ncap - 1, 0, .25), # Drifts,
+    drift = rnorm(pars$ncap - 1, 0, .25), # Drifts,
     sigmasq = .5
   ) # Individual variance
 
@@ -26,8 +32,8 @@ run_replicate <- function(pars, verbose = TRUE) {
 
   ## 3) Capture and recovery
   c_params <- list(
-    p = c(NA, rep(.6, ncap - 1)),
-    lambda = rep(.3, ncap - 1)
+    p = c(NA, rep(.6, pars$ncap - 1)),
+    lambda = rep(.3, pars$ncap - 1)
   )
 
   ## Simulate Data for nind Individuals ##
@@ -35,8 +41,8 @@ run_replicate <- function(pars, verbose = TRUE) {
     cat(date(), ": Simulating data...\n")
   }
   
-  sim_data <- generate_data(nind, ncap, d_params, s_params, c_params)
-  saveRDS(sim_data, file.path("Data", paste0(model, "_data_", sim, "_", rep, ".rds")))
+  sim_data <- generate_data(pars$nind, pars$ncap, d_params, s_params, c_params)
+  saveRDS(sim_data, file.path("Data", paste0(pars$model, "_data_", pars$sim, "_", pars$rep, ".rds")))
   on.exit(rm("sim_data"), add = TRUE, after = FALSE)
   
   ## Fit trinomial model ##
@@ -45,14 +51,14 @@ run_replicate <- function(pars, verbose = TRUE) {
   }
 
   trinomial_out <- run_trinomial(indata = sim_data,
-                                 model = model,
+                                 model = pars$model,
                                  coda_dir = "Trinomial",
-                                 chains = chains,
-                                 burnin = burnin,
-                                 sampling = samples)
+                                 chains = pars$chains,
+                                 burnin = pars$burnin,
+                                 sampling = pars$samples)
   saveRDS(
     trinomial_out,
-    file.path("Output", paste0("trinomial_", model, "_out_", sim, "_", rep, ".rds"))
+    file.path("Output", paste0("trinomial_", pars$model, "_out_", pars$sim, "_", pars$rep, ".rds"))
   )
   on.exit(rm("trinomial_out"), add = TRUE, after = FALSE)
   
@@ -63,14 +69,14 @@ run_replicate <- function(pars, verbose = TRUE) {
   }
 
   binomial_out <- run_binomial(indata = sim_data,
-                               model = model,
+                               model = pars$model,
                                coda_dir = "Binomial",
-                               chains = chains,
-                               burnin = burnin,
-                               sampling = samples)
+                               chains = pars$chains,
+                               burnin = pars$burnin,
+                               sampling = pars$samples)
   saveRDS(
     binomial_out,
-    file.path("Output", paste0("binomial_", model, "_out_", sim, "_", rep, ".rds"))
+    file.path("Output", paste0("binomial_", pars$model, "_out_", pars$sim, "_", pars$rep, ".rds"))
   )
   on.exit(rm("binomial_out"), add = TRUE, after = FALSE)
   
@@ -81,14 +87,14 @@ run_replicate <- function(pars, verbose = TRUE) {
 
   alt_trinomial_out <- run_trunc_model(k = 2,
                                        indata = sim_data,
-                                       model = model,
+                                       model = pars$model,
                                        coda_dir = "Alt_Trinomial",
-                                       chain = chains,
-                                       burnin = burnin,
-                                       sampling = samples)
+                                       chains = pars$chains,
+                                       burnin = pars$burnin,
+                                       sampling = pars$samples)
   saveRDS(
     alt_trinomial_out,
-    file.path("Output", paste0("alt_trinomial_", model, "_out_", sim, "_", rep, ".rds"))
+    file.path("Output", paste0("alt_trinomial_", pars$model, "_out_", pars$sim, "_", pars$rep, ".rds"))
   )
 
   ## Fit complete data model ##
@@ -96,16 +102,16 @@ run_replicate <- function(pars, verbose = TRUE) {
     cat(date(), ": Running complete data model...\n")
   }
 
-  complete_out <- run_trunc_model(k = ncap,
+  complete_out <- run_trunc_model(k = pars$ncap,
                                   indata = sim_data,
-                                  model = model,
+                                  model = pars$model,
                                   coda_dir = "Complete_Data",
-                                  chains = chains,
-                                  burnin = burnin,
-                                  sampling = samples)
+                                  chains = pars$chains,
+                                  burnin = pars$burnin,
+                                  sampling = pars$samples)
   saveRDS(
     complete_out,
-    file.path("Output", paste0("complete_", model, "_out_", sim, "_", rep, ".rds"))
+    file.path("Output", paste0("complete_", pars$model, "_out_", pars$sim, "_", pars$rep, ".rds"))
   )
   on.exit(rm("complete_out"), add = TRUE, after = FALSE)
   ## Extract summary ##
@@ -128,7 +134,7 @@ run_replicate <- function(pars, verbose = TRUE) {
 
   saveRDS(
     summary_all,
-    file.path("Output", paste0("summary_", sim, "_", rep, ".rds"))
+    file.path("Output", paste0("summary_", pars$sim, "_", pars$rep, ".rds"))
   )
   on.exit(rm("summary_all"), add = TRUE, after = FALSE)
   
