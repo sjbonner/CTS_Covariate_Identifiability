@@ -22,8 +22,7 @@ run_trunc_model <- function(k,
                             indata,
                             model = c("logit", "scaled", "generalized"),
                             inits = NULL,
-                            priors = list(phi = NULL,
-                                          p = NULL),
+                            priors = NULL,
                             pars = NULL,
                             coda_dir,
                             chains = 3,
@@ -100,23 +99,23 @@ run_trunc_model <- function(k,
   ## Set hyperparameters
 
   ## Covariate model
-  if(is.null(priors[["mu"]]){
+  if(is.null(priors[["mu"]])){
     trunc_jags_data$mu.z.hyper <- c(0,1)
   }
   else{
     trunc_jags_data$mu.z.hyper <- priors$mu
   }
 
-  if(is.null(priors[["sigma"]]){
-    trunc_jags_data$sigma.z <- c(.74^2, 4)
+  if(is.null(priors[["sigma"]])){
+    trunc_jags_data$sigma.z.hyper <- c(.74^2, 4)
   }
   else{
-    trunc_jags_data$sigma.z <- priors$sigma
+    trunc_jags_data$sigma.z.hyper <- priors$sigma
   }
     
   ## Survival
   if(is.null(priors[["phi"]])){
-    trunc_jags_data$beta.phi.hyper <- rbind(c(0, .01), c(0, .01))
+    trunc_jags_data$beta.phi.hyper <- rbind(c(0, .25), c(0, .25))
   }
   else{
     trunc_jags_data$beta.phi.hyper <- priors$phi
