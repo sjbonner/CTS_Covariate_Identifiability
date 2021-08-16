@@ -51,7 +51,7 @@ model{
         mu.z[t] ~ dnorm(mu.z.hyper[1], mu.z.hyper[2])
     }
 
-  sigma.z ~ dt(0, sigma.z.hyper[1], sigma.z.hyper[2])
+  sigma.z ~ T(dt(0, sigma.z.hyper[1], sigma.z.hyper[2]), 0, )
   tau.z <- 1/(sigma.z * sigma.z)
 
   ## Survival probability
