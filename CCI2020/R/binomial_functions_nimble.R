@@ -62,7 +62,7 @@ run_binomial <- function(indata,
   ## Set hyperparameters
   ## Survival
   if(is.null(priors[["phi"]])){
-    binomial_data$beta.phi.hyper <- rbind(c(0, .01), c(0, .01))
+    binomial_data$beta.phi.hyper <- rbind(c(0, .25), c(0, .25))
   }
   else{
     binomial_data$beta.phi.hyper <- priors$phi
