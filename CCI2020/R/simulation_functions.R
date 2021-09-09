@@ -25,8 +25,8 @@ run_replicate <- function(pars, verbose = TRUE) {
 
   ## 2) Survival
   s_params <- list(
-    lower = ifelse(model == "generalized_logit", .3, 0),
-    upper = ifelse(model == "logit", 1, .7),
+    lower = ifelse(pars$model == "generalized_logit", .3, 0),
+    upper = ifelse(pars$model == "logit", 1, .7),
     beta = c(-.5, 4)
   )
 
