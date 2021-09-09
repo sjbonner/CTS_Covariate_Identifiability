@@ -16,20 +16,21 @@ model{
       outcome[i] ~ dcat(Probs[i,1:3])
     }
 
-    ##### Priors #####
-    ## Survival probability
-    beta.phi[1] ~ dnorm(0,.01)
-    beta.phi[2] ~ dnorm(0,.01)
+  ##### Priors #####
+  ## Survival probability
+  for(k in 1:2){
+    beta.phi[k] ~ dnorm(beta.phi.hyper[k,1], beta.phi.hyper[k,2])
+  }
 
   ## Scale parameter
   lower <- 0
   upper ~ dunif(0,1)
   
   ## Capture probability
-  p ~ dunif(0,1)
+  p ~ dunif(p.hyper[1],p.hyper[2])
 
   ## Recovery probability
-  lambda ~ dunif(0,1)
+  lambda ~ dunif(lambda.hyper[1],lambda.hyper[2])
 }
 
     
