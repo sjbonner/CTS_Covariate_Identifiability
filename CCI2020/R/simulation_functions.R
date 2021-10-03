@@ -5,6 +5,7 @@
 ##' @param pars Vector of simulation parameters including sim (scenario number), rep (replicate number wihin scenario), nind (number of individuals), ncap (number of individuals), model (either logit, scaled_logit, or generalized_logit), chains (number of chains), burnin (number of burnin samples), samples (number of samples to retain for computing posterior summary statistics)
 ##' @param verbose If true then print logging information to console
 ##' @export
+##' @import MASS
 ##' @return
 ##' @author Simon Bonner
 run_replicate <- function(pars, verbose = TRUE) {
