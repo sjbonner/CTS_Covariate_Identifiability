@@ -81,23 +81,6 @@ run_replicate <- function(pars, verbose = TRUE) {
   )
   on.exit(rm("binomial_out"), add = TRUE, after = FALSE)
   
-  ## Fit alternative trinomial model ##
-  if (verbose) {
-    cat(date(), ": Running alternative trinomial model...\n")
-  }
-
-  alt_trinomial_out <- run_trunc_model(k = 2,
-                                       indata = sim_data,
-                                       model = pars$model,
-                                       coda_dir = "Alt_Trinomial",
-                                       chains = pars$chains,
-                                       burnin = pars$burnin,
-                                       sampling = pars$samples)
-  saveRDS(
-    alt_trinomial_out,
-    file.path("Output", paste0("alt_trinomial_", pars$model, "_out_", pars$sim, "_", pars$rep, ".rds"))
-  )
-
   ## Fit complete data model ##
   if (verbose) {
     cat(date(), ": Running complete data model...\n")
@@ -129,7 +112,6 @@ run_replicate <- function(pars, verbose = TRUE) {
   summary_all <- bind_rows(
     as_tibble(trinomial_out$summary, "Trinomial", 3),
     as_tibble(binomial_out$summary, "Binomial", 4),
-    as_tibble(alt_trinomial_out$summary, "Alt. Trinomial", 2),
     as_tibble(complete_out$summary, "Complete", 1)
   )
 
