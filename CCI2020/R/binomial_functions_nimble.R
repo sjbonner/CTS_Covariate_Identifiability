@@ -7,7 +7,6 @@
 ##' @param inits Initial values
 ##' @param priors Specification of hyperparameters
 ##' @param pars Parameters to monitor 
-##' @param coda_dir Directory for saving samples
 ##' @param chains Number of chains
 ##' @param burnin Length of burnin period
 ##' @param sampling Length of sampling period
@@ -22,7 +21,6 @@ run_binomial <- function(indata,
                          priors = list(phi = NULL,
                                        p = NULL),
                          pars = NULL,
-                         coda_dir,
                          chains = 3,
                          burnin = 1000,
                          sampling = 1000) {
@@ -62,7 +60,7 @@ run_binomial <- function(indata,
   ## Set hyperparameters
   ## Survival
   if(is.null(priors[["phi"]])){
-    binomial_data$beta.phi.hyper <- rbind(c(0, .25), c(0, .25))
+    binomial_data$beta.phi.hyper <- rbind(c(0, .01, 1), c(0, .16, 1))
   }
   else{
     binomial_data$beta.phi.hyper <- priors$phi
@@ -89,9 +87,8 @@ run_binomial <- function(indata,
   }
   
   ## Run model
-  model_file <- system.file("JAGS",paste0("binomial_",model,".R"),
+  model_file <- system.file("Nimble",paste0("binomial_",model,".R"),
                             package="CCI2020")
-  coda_file <- file.path(coda_dir, paste0("binomial_",model,".rds"))
   
   ## Run model
   nimble_model <- readBUGSmodel(model_file,
@@ -108,9 +105,6 @@ run_binomial <- function(indata,
       samplesAsCodaMCMC = TRUE)
   )
   
-  ## Save output
-  saveRDS(binomial_mcmc, file = coda_file)
-
   ## Return summaries
   output <- list(summary = summary(window(binomial_mcmc, start = burnin + 1)),
        mcmc = binomial_mcmc,

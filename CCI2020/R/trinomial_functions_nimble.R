@@ -7,7 +7,6 @@
 ##' @param inits Initial values
 ##' @param priors Specification of hyperparameters
 ##' @param pars Parameters to monitor 
-##' @param coda_dir Directory for saving samples
 ##' @param chains Number of chains
 ##' @param burnin Length of burnin period
 ##' @param sampling Length of sampling period
@@ -21,7 +20,6 @@ run_trinomial <- function(indata,
                           inits = NULL,
                           priors = NULL,
                           pars = NULL,
-                          coda_dir,
                           chains = 3,
                           burnin = 1000,
                           sampling = 1000) {
@@ -66,7 +64,7 @@ run_trinomial <- function(indata,
     
   ## Survival
   if(is.null(priors[["phi"]])){
-    trinomial_data$beta.phi.hyper <- rbind(c(0, .25), c(0, .25))
+    trinomial_data$beta.phi.hyper <- rbind(c(0, .01, 1), c(0, .16, 1))
   }
   else{
     trinomial_data$beta.phi.hyper <- priors$phi
@@ -102,9 +100,8 @@ run_trinomial <- function(indata,
 
   
   ## Run model
-  model_file <- system.file("JAGS",paste0("trinomial_",model,".R"),
+  model_file <- system.file("Nimble",paste0("trinomial_",model,".R"),
                             package="CCI2020")
-  coda_file <- file.path(coda_dir, paste0("trinomial_", model, ".rds"))
 
   nimble_model <- readBUGSmodel(model_file,
     data = trinomial_data,
@@ -121,9 +118,6 @@ run_trinomial <- function(indata,
       samplesAsCodaMCMC = TRUE
     )
   )
-
-  ## Save output
-  saveRDS(trinomial_mcmc, file = coda_file)
 
   ## Return summaries
    output <- list(summary = summary(window(trinomial_mcmc, start = burnin + 1)),

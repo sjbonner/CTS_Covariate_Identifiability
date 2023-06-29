@@ -1,0 +1,55 @@
+model{
+
+    ##### Likelihood #####
+
+    for(i in 1:nrelease){ ## i -- releases
+        for(j in 1:delta[i]){
+            ## Impute covariate values
+            mu.z.tmp[i,j] <- Z[i,j] + mu.z[release[i]+j-1]
+            Z[i,j+1] ~ dnorm(mu.z.tmp[i,j],tau.z)
+        
+            ## Survival probabilities
+            logit(phi[i,j]) <- beta.phi[1] + beta.phi[2] * Z[i,j]
+        }
+    }
+
+    ## Likelihood contributions
+  
+    ## 1) Recaptures
+    for(i in 1:nrecapture){
+        Prob[i] <- drecap(delta[i], phi[i,1:delta[i]], p)
+    }
+  
+    ## 2) Evasions
+    for(i in 1:(nrelease - nrecapture)){
+      Prob[nrecapture + i] <- devade(delta[nrecapture + i], phi[nrecapture + i,1:delta[nrecapture + i]], p, 0)
+    }
+  
+    ## Likelihood
+    for(i in 1:nrelease){
+      dummy[i] ~ dbern(Prob[i])
+    }
+  
+    ##### Priors #####
+
+    ## Covariate model
+    for(t in 1:(nocc-1)){
+        mu.z[t] ~ dnorm(mu.z.hyper[1], mu.z.hyper[2])
+    }
+
+  sigma.z ~ T(dt(0, sigma.z.hyper[1], sigma.z.hyper[2]), 0, )
+  tau.z <- 1/(sigma.z * sigma.z)
+
+  ## Survival probability
+  for(k in 1:2){
+    beta.phi[k] ~ dt(beta.phi.hyper[k,1], beta.phi.hyper[k,2], beta.phi.hyper[k,3])
+  }
+
+  ## Capture probability
+  p ~ dunif(p.hyper[1],p.hyper[2])
+}
+
+    
+
+        
+                  

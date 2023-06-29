@@ -4,7 +4,7 @@ survival <- function(z, s.params) {
 
   ## Set default bounds if not provided
   if (is.null(s.params$lower)) {
-    s.params$lower <- 1
+    s.params$lower <- 0
   }
 
   if (is.null(s.params$upper)) {

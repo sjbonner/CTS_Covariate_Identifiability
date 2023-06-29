@@ -18,12 +18,12 @@ model{
     ##### Priors #####
   ## Survival probability
   for(k in 1:2){
-    beta.phi[k] ~ dnorm(beta.phi.hyper[k,1], beta.phi.hyper[k,2])
+    beta.phi[k] ~ dt(beta.phi.hyper[k,1], beta.phi.hyper[k,2], beta.phi.hyper[k,3])
   }
 
   ## Scale parameter
-  lower ~ dunif(0,1)
-  upper ~ dunif(lower,1)
+  lower <- 0
+  upper <- 1
   
   ## Capture probability
   p ~ dunif(p.hyper[1],p.hyper[2])
